@@ -31,21 +31,17 @@ class ForumCorpusReader(XMLCorpusReader):
     def tagged_sentences(self, lemmatize=True):
         sents = XMLCorpusView(self.path, '.*/sentence')
         sent_list = list()
-        if lemmatize:
-            for sent in sents:
-                if lemmatize:
-                    word_list = [ (word.text,
-                                   word.attrib['pos'],
-                                   word.attrib['lemma'].replace("|", ""))
-                                   for word in sent ]
-                else:
-                    word_list = [ (word.text,
-                                   word.attrib['pos'])
-                                   for word in sent ]
-                sent_list.append(word_list)
-        else:
-            sent_list = list()
-            word_list = []
+        for sent in sents:
+            if lemmatize:
+                word_list = [ (word.text,
+                               word.attrib['pos'],
+                               word.attrib['lemma'].replace("|", ""))
+                               for word in sent ]
+            else:
+                word_list = [ (word.text,
+                               word.attrib['pos'])
+                               for word in sent ]
+            sent_list.append(word_list)
         return sent_list
 
 if __name__ == '__main__':
