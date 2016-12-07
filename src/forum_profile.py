@@ -1,4 +1,5 @@
 from nltk.util import ngrams
+from nltk.corpus import stopwords
 
 # Prototyped in notebook 0.2
 class ForumProfile():
@@ -6,20 +7,19 @@ class ForumProfile():
         self.corpus = forum_corpus
         self.ngram_order = ngram_order
         self.ngrams = self.make_ngrams()
-        self.ngram_distribution = {}
-        self.count_ngrams()
+        self.ngram_distribution = FreqDist(self.ngrams)
 
     def make_ngrams(self):
-        corpus_words = self.corpus.words()
+        # Reject words that are not alphabetical and reject stopwords
+        swedish_stopwords = stopwords.words('swedish')
+        corpus_words = [word.lower() for word in self.corpus.words()
+                        if (word.isalpha()
+                        and word not in swedish_stopwords)]
         return list(ngrams(corpus_words, self.ngram_order))
 
-    def count_ngrams(self):
-        if self.ngrams is None:
-            return
-
-        for ngram in self.ngrams:
-          if not ngram in self.ngram_distribution:
-              self.ngram_distribution.update({ngram:1})
-          else:
-              ngram_occurrences = self.ngram_distribution[ngram]
-              self.ngram_distribution.update({ngram:ngram_occurrences+1})
+if __name__ == '__main__':
+    # Testing
+    from forum_corpus_reader import ForumCorpusReader
+    fam_corpus = ForumCorpusReader('data/', r'familjeliv-sexsamlevnad.xml')
+    fam_profile = ForumProfile(fam_corpus, 3)
+    print("Finished")
