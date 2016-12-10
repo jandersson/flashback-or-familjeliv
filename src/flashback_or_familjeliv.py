@@ -1,3 +1,4 @@
+from nltk import classify
 from nltk.classify import NaiveBayesClassifier
 
 from forum_profile import ForumProfile
@@ -11,7 +12,7 @@ def generate_features(file, label):
     # corpus = ForumCorpusReader(DATA_DIR, file)
     # profile = ForumProfile(corpus, N_GRAMS)
     # return profile.features()
-    return [({label: 1}, label) for x in range(10)]
+    return [({file: 1}, label) for x in range(10)]
 
 
 def train_and_classify():
@@ -30,14 +31,22 @@ def train_and_classify():
     test_set_unlabeled = [features for (features, labels) in test_set]
 
     classifier = NaiveBayesClassifier.train(train_set)
-    classifier.classify_many(test_set_unlabeled)
+    train_accuracy = classify.accuracy(classifier, train_set)
+    test_accuracy = classify.accuracy(classifier, test_set)
+
+    print("Train accuracy: {acc}".format(acc=train_accuracy))
+    print("Test accuracy: {acc}".format(acc=test_accuracy))
+
+    print("----------------")
 
     # Print probabilities
-    for test in test_set_unlabeled:
-        print(test)
-        print(classifier.prob_classify(test).prob('fam'))
-        print(classifier.prob_classify(test).prob('flash'))
-        print(classifier.classify(test))
+    for i, test in enumerate(test_set_unlabeled[:10]):
+        guess = classifier.classify(test)
+        fam_prob = classifier.prob_classify(test).prob('fam')
+        flash_prob = classifier.prob_classify(test).prob('flash')
+
+        print("Data point: {data} \nGuess: {guess}".format(data=test_set[i], guess=guess))
+        print("Fam probability: {fam} \nFlash probability: {flash}".format(fam=fam_prob, flash=flash_prob))
         print("\n")
 
 
