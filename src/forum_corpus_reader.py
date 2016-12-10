@@ -58,10 +58,6 @@ class ForumCorpusReader(XMLCorpusReader):
 
 
 if __name__ == '__main__':
-    from scipy.sparse import csr_matrix
-    from nltk.classify import PositiveNaiveBayesClassifier
-    # from nltk.classify import NaiveBayes
-    # nltk.classify.naivebayes.demo()
     fam_corpus = ForumCorpusReader('data/', 'familjeliv-sex25.xml')
     sents = fam_corpus.tagged_sentences()[:25]
     print(sents)
