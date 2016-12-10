@@ -1,6 +1,8 @@
 from nltk import classify
 from nltk.classify import NaiveBayesClassifier
 import random
+import pickle
+import os.path
 
 from forum_profile import ForumProfile
 from forum_corpus_reader import ForumCorpusReader
@@ -18,12 +20,21 @@ def generate_features(file, label):
     return profile.generate_features()
 
 
-def train_and_classify():
-    fam_set = generate_features(FAM_FILE, 'fam')
-    flash_set = generate_features(FLASH_FILE, 'flash')
-    data_set = fam_set + flash_set
+def load_or_generate_features(file, label, load_if_exists=True):
+    pickle_file = "data/{label}.p".format(label=label)
+    if os.path.isfile(pickle_file) and load_if_exists:
+        return pickle.load(open(pickle_file, "rb"))
+    feats = generate_features(file, label)
+    pickle.dump(feats, open(pickle_file, "wb"))
+    return feats
 
+
+def train_and_classify():
+    fam_set = load_or_generate_features(FAM_FILE, 'fam')
+    flash_set = load_or_generate_features(FLASH_FILE, 'flash')
+    data_set = fam_set + flash_set
     random.shuffle(data_set)
+
     data_size = len(data_set)
     train_set = data_set[:int(TRAIN_TEST_RATIO * data_size)]
     test_set = data_set[int(TRAIN_TEST_RATIO * data_size):]
