@@ -8,30 +8,36 @@ from forum_profile import ForumProfile
 from forum_corpus_reader import ForumCorpusReader
 
 DATA_DIR = 'data/'
-FAM_FILE = r'familjeliv-sex1.xml'
-FLASH_FILE = r'flashback-sex1.xml'
+FAM_DIR = 'familjeliv/'
+FLASH_DIR = 'flashback/'
+
 NGRAM_ORDER = 1
 TRAIN_TEST_RATIO = 0.7
 
 
-def generate_features(file, label):
-    corpus = ForumCorpusReader(DATA_DIR, file)
+def generate_features(class_dir, file, label):
+    corpus = ForumCorpusReader(DATA_DIR + class_dir, file)
     profile = ForumProfile(corpus, label, NGRAM_ORDER)
     return profile.generate_features()
 
 
-def load_or_generate_features(file, label, load_if_exists=True):
-    pickle_file = "data/{label}.p".format(label=label)
-    if os.path.isfile(pickle_file) and load_if_exists:
-        return pickle.load(open(pickle_file, "rb"))
-    feats = generate_features(file, label)
-    pickle.dump(feats, open(pickle_file, "wb"))
-    return feats
+def load_or_generate_features(class_dir, label, load_if_exists=True):
+    # pickle_file = "data/{label}.p".format(label=label)
+    feature_list = []
+    for filename in os.listdir(DATA_DIR + class_dir):
+        if filename.endswith(".xml"):
+            pickle_file = DATA_DIR + class_dir + filename[:-4] + ".p"
+            if not (os.path.isfile(pickle_file) and load_if_exists):
+                feats = generate_features(class_dir, filename, label)
+                pickle.dump(feats, open(pickle_file, "wb"))
+
+            feature_list += pickle.load(open(pickle_file, "rb"))
+    return feature_list
 
 
 def train_and_classify():
-    fam_set = load_or_generate_features(FAM_FILE, 'fam')
-    flash_set = load_or_generate_features(FLASH_FILE, 'flash')
+    fam_set = load_or_generate_features(FAM_DIR, 'fam')
+    flash_set = load_or_generate_features(FLASH_DIR, 'flash')
     data_set = fam_set + flash_set
     random.shuffle(data_set)
 
