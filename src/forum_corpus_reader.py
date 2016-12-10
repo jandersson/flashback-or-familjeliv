@@ -1,6 +1,6 @@
 from nltk.corpus.reader.xmldocs import XMLCorpusView
 from nltk.corpus.reader.xmldocs import XMLCorpusReader
-
+import re
 
 # Prototyped in notebook 0.1
 class ForumCorpusReader(XMLCorpusReader):
@@ -18,13 +18,24 @@ class ForumCorpusReader(XMLCorpusReader):
             sent_list.append(word_list)
         return sent_list
 
+    def get_lemma(self, word_data):
+        '''Return lemma as a string, if the lemma is already in 'grundform' then return the word text
+        if the word has multiple lemmas, then return the first
+        '''
+
+        lemma = word_data.attrib['lemma']
+        if lemma == "|":
+            return word_data.text
+        else:
+            return re.search('\|*(\w*)\|+', lemma).group(0).replace("|", "")
+
     def tagged_words(self, lemmatize=True):
         words = XMLCorpusView(self.path, '.*/w')
         if lemmatize:
-            word_tags = [(word.text,
-                          word.attrib['pos'],
-                          word.attrib['lemma'].replace("|", ""))
-                         for word in words]
+            word_tags = [ ( word.text,
+                            word.attrib['pos'],
+                            self.get_lemma(word) )
+                         for word in words ]
         else:
             word_tags = [(word.text, word.attrib['pos']) for word in words]
         return word_tags
@@ -34,18 +45,23 @@ class ForumCorpusReader(XMLCorpusReader):
         sent_list = list()
         for sent in sents:
             if lemmatize:
-                word_list = [(word.text,
-                              word.attrib['pos'],
-                              word.attrib['lemma'].replace("|", ""))
-                             for word in sent]
+                word_list = [ ( word.text,
+                                word.attrib['pos'],
+                                self.get_lemma(word) )
+                             for word in sent ]
             else:
-                word_list = [(word.text,
-                              word.attrib['pos'])
-                             for word in sent]
+                word_list = [ ( word.text,
+                                word.attrib['pos'] )
+                                for word in sent ]
             sent_list.append(word_list)
         return sent_list
 
 
 if __name__ == '__main__':
+    from scipy.sparse import csr_matrix
+    from nltk.classify import PositiveNaiveBayesClassifier
+    # from nltk.classify import NaiveBayes
+    # nltk.classify.naivebayes.demo()
     fam_corpus = ForumCorpusReader('data/', 'familjeliv-sex25.xml')
-    print(fam_corpus.tagged_sentences()[:2])
+    sents = fam_corpus.tagged_sentences()[:25]
+    print(sents)
