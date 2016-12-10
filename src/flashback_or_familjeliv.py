@@ -11,7 +11,7 @@ def generate_features(file, label):
     # corpus = ForumCorpusReader(DATA_DIR, file)
     # profile = ForumProfile(corpus, N_GRAMS)
     # return profile.features()
-    return [({file: x}, label) for x in range(10)]
+    return [({label: 1}, label) for x in range(10)]
 
 
 def train_and_classify():
@@ -26,10 +26,19 @@ def train_and_classify():
     random.shuffle(data_set)
     data_size = len(data_set)
     train_set = data_set[:int(0.7 * data_size)]
-    test_set = data_set[int(0.7 * data_size):]  # TODO: Remove label
+    test_set = data_set[int(0.7 * data_size):]
+    test_set_unlabeled = [features for (features, labels) in test_set]
 
     classifier = NaiveBayesClassifier.train(train_set)
-    print(classifier.classify(test_set[:]))
+    classifier.classify_many(test_set_unlabeled)
+
+    # Print probabilities
+    for test in test_set_unlabeled:
+        print(test)
+        print(classifier.prob_classify(test).prob('fam'))
+        print(classifier.prob_classify(test).prob('flash'))
+        print(classifier.classify(test))
+        print("\n")
 
 
 if __name__ == '__main__':
