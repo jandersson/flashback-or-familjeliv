@@ -16,12 +16,18 @@ TRAIN_TEST_RATIO = 0.7
 
 
 def generate_features(class_dir, file, label):
+    """
+    Generate and return labeled features of DATA_DIR/class_dir/file with
+    """
     corpus = ForumCorpusReader(DATA_DIR + class_dir, file)
     profile = ForumProfile(corpus, label, NGRAM_ORDER)
     return profile.generate_features()
 
 
 def load_or_generate_features(class_dir, label, load_if_exists=True):
+    """
+    For each .xml file in DATA_DIR/class_dir, load the corresponding pickle file if exists, otherwise create it.
+    """
     # pickle_file = "data/{label}.p".format(label=label)
     feature_list = []
     for filename in os.listdir(DATA_DIR + class_dir):
@@ -36,26 +42,29 @@ def load_or_generate_features(class_dir, label, load_if_exists=True):
 
 
 def train_and_classify():
+    # Load data
     fam_set = load_or_generate_features(FAM_DIR, 'fam')
     flash_set = load_or_generate_features(FLASH_DIR, 'flash')
     data_set = fam_set + flash_set
     random.shuffle(data_set)
 
+    # Split into training and test set
     data_size = len(data_set)
     train_set = data_set[:int(TRAIN_TEST_RATIO * data_size)]
     test_set = data_set[int(TRAIN_TEST_RATIO * data_size):]
     test_set_unlabeled = [features for (features, labels) in test_set]
 
+    # Create classifier
     classifier = NaiveBayesClassifier.train(train_set)
     train_accuracy = classify.accuracy(classifier, train_set)
     test_accuracy = classify.accuracy(classifier, test_set)
 
+    # Print classifier statistics
     print("Train accuracy: {acc}".format(acc=train_accuracy))
     print("Test accuracy: {acc}".format(acc=test_accuracy))
-
     print("----------------")
 
-    # Print probabilities
+    # Print classification with probabilities for 10 test data
     for i, test in enumerate(test_set_unlabeled[:10]):
         guess = classifier.classify(test)
         fam_prob = classifier.prob_classify(test).prob('fam')
