@@ -8,8 +8,8 @@ from forum_profile import ForumProfile
 from forum_corpus_reader import ForumCorpusReader
 
 DATA_DIR = 'data/'
-FAM_FILE = r'familjeliv-sex1.xml'
-FLASH_FILE = r'flashback-sex1.xml'
+FAM_FILE = 'familjeliv-sex1.xml'
+FLASH_FILE = 'flashback-sex1.xml'
 NGRAM_ORDER = 1
 TRAIN_TEST_RATIO = 0.7
 
@@ -21,7 +21,8 @@ def generate_features(file, label):
 
 
 def load_or_generate_features(file, label, load_if_exists=True):
-    pickle_file = "data/{label}.p".format(label=label)
+    # pickle_file = "data/{label}.p".format(label=label)
+    pickle_file = DATA_DIR + file[:-4] + ".p"
     if os.path.isfile(pickle_file) and load_if_exists:
         return pickle.load(open(pickle_file, "rb"))
     feats = generate_features(file, label)
