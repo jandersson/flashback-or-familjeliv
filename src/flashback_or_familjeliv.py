@@ -23,6 +23,11 @@ def generate_features(class_dir, file, label):
 
 def load_or_generate_features(class_dir, label, load_if_exists=True):
     # pickle_file = "data/{label}.p".format(label=label)
+
+    abspath = os.path.abspath(__file__)
+    dname = os.path.dirname(abspath)
+    os.chdir(dname)
+
     feature_list = []
     for filename in os.listdir(DATA_DIR + class_dir):
         if filename.endswith(".xml"):
