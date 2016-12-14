@@ -3,6 +3,8 @@ from nltk.classify import NaiveBayesClassifier
 import random
 import pickle
 import os.path
+import csv
+from datetime import datetime
 
 from forum_profile import ForumProfile
 from forum_corpus_reader import ForumCorpusReader
@@ -11,9 +13,27 @@ DATA_DIR = 'data/'
 FAM_DIR = 'familjeliv/'
 FLASH_DIR = 'flashback/'
 
+FLASH_LABEL = 'housing'
+FL_LABEL = 'sexsamhallet'
+
 NGRAM_ORDER = 1
 TRAIN_TEST_RATIO = 0.7
 
+TIMESTAMP = str(datetime.now())
+COMMENT = "Familjeliv Housing vs Familjeliv Sexsamhallet"
+
+def write_results(results):
+    '''Writes results to csv file. Takes a list of results.
+    '''
+    with open('results.csv', 'a', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(results)
+
+def write_informative_feats(classifier, num_feats):
+    '''Takes a classifier and writes out the given number of informative features to disk
+    '''
+    with open('feats.txt', 'a') as f:
+        f.write(str(classifier.most_informative_features(num_feats)) + " " + COMMENT + '\n')
 
 def generate_features(class_dir, file, label):
     corpus = ForumCorpusReader(DATA_DIR + class_dir, file)
@@ -42,8 +62,8 @@ def load_or_generate_features(class_dir, label, load_if_exists=True):
 
 
 def train_and_classify():
-    fam_set = load_or_generate_features(FAM_DIR, 'fam')
-    flash_set = load_or_generate_features(FLASH_DIR, 'flash')
+    fam_set = load_or_generate_features(FAM_DIR, FL_LABEL)
+    flash_set = load_or_generate_features(FLASH_DIR, FLASH_LABEL)
     data_set = fam_set + flash_set
     random.shuffle(data_set)
 
@@ -62,17 +82,18 @@ def train_and_classify():
 
     print("----------------")
 
-    print(classifier.most_informative_features(10))
+    print(classifier.show_most_informative_features(10))
     # Print probabilities
     for i, test in enumerate(test_set_unlabeled[:10]):
         guess = classifier.classify(test)
-        fam_prob = classifier.prob_classify(test).prob('fam')
-        flash_prob = classifier.prob_classify(test).prob('flash')
+        fam_prob = classifier.prob_classify(test).prob(FL_LABEL)
+        flash_prob = classifier.prob_classify(test).prob(FLASH_LABEL)
 
         print("Data point: {data} \nGuess: {guess}".format(data=test_set[i], guess=guess))
         print("Fam probability: {fam} \nFlash probability: {flash}".format(fam=fam_prob, flash=flash_prob))
         print("\n")
-
+    write_results([TIMESTAMP, train_accuracy, test_accuracy, COMMENT])
+    write_informative_feats(classifier, 10)
 
 if __name__ == '__main__':
     train_and_classify()
