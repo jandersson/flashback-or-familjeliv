@@ -20,6 +20,7 @@ FL_LABEL = 'sexsamhallet'
 
 NGRAM_ORDER = 1
 TRAIN_TEST_RATIO = 0.7
+MAXENT_CUTOFF = 3
 
 TIMESTAMP = str(datetime.now())
 COMMENT = "Familjeliv Housing vs Familjeliv Sexsamhallet"
@@ -83,8 +84,12 @@ def train_and_classify(classifierClass):
     test_set_unlabeled = [features for (features, labels) in test_set]
 
     # Create classifier
+
     print("Training {classifier}...".format(classifier=classifierClass.__name__))
-    classifier = classifierClass.train(train_set)
+    if classifierClass.__name__ == "MaxentClassifier":
+        classifier = classifierClass.train(train_set, max_iter=MAXENT_CUTOFF)
+    else:
+        classifier = classifierClass.train(train_set)
     train_accuracy = classify.accuracy(classifier, train_set)
     test_accuracy = classify.accuracy(classifier, test_set)
 
@@ -107,6 +112,6 @@ def train_and_classify(classifierClass):
     write_informative_feats(classifier, 10)
 
 if __name__ == '__main__':
-    train_and_classify(NaiveBayesClassifier)
+    # train_and_classify(NaiveBayesClassifier)
     # train_and_classify(DecisionTreeClassifier)
-    # train_and_classify(MaxentClassifier)
+    train_and_classify(MaxentClassifier)
