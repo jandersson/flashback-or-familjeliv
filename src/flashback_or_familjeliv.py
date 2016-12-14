@@ -1,5 +1,7 @@
 from nltk import classify
 from nltk.classify import NaiveBayesClassifier
+from nltk.classify import DecisionTreeClassifier
+from nltk.classify import MaxentClassifier
 import random
 import pickle
 import os.path
@@ -47,7 +49,7 @@ def load_or_generate_features(class_dir, label, load_if_exists=True):
     return feature_list
 
 
-def train_and_classify():
+def train_and_classify(classifierClass):
     # Load data
     fam_set = load_or_generate_features(FAM_DIR, 'fam')
     flash_set = load_or_generate_features(FLASH_DIR, 'flash')
@@ -61,8 +63,8 @@ def train_and_classify():
     test_set_unlabeled = [features for (features, labels) in test_set]
 
     # Create classifier
-    print("Training Naive Bayes Classifier...")
-    classifier = NaiveBayesClassifier.train(train_set)
+    print("Training {classifier}...".format(classifier=classifierClass.__name__))
+    classifier = classifierClass.train(train_set)
     train_accuracy = classify.accuracy(classifier, train_set)
     test_accuracy = classify.accuracy(classifier, test_set)
 
@@ -84,4 +86,6 @@ def train_and_classify():
 
 
 if __name__ == '__main__':
-    train_and_classify()
+    train_and_classify(NaiveBayesClassifier)
+    # train_and_classify(DecisionTreeClassifier)
+    # train_and_classify(MaxentClassifier)
