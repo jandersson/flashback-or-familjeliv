@@ -2,6 +2,7 @@ from nltk.corpus.reader.xmldocs import XMLCorpusView
 from nltk.corpus.reader.xmldocs import XMLCorpusReader
 import re
 
+
 # Prototyped in notebook 0.1
 class ForumCorpusReader(XMLCorpusReader):
     def __init__(self, root, fileid):
@@ -32,12 +33,11 @@ class ForumCorpusReader(XMLCorpusReader):
     def tagged_words(self, lemmatize=True):
         words = XMLCorpusView(self.path, '.*/w')
         if lemmatize:
-            word_tags = [ ( word.text,
-                            word.attrib['pos'],
-                            self.get_lemma(word) )
-                         for word in words ]
+            word_tags = [(word.text, word.attrib['pos'], self.get_lemma(word))
+                         for word in words]
         else:
-            word_tags = [(word.text, word.attrib['pos']) for word in words]
+            word_tags = [(word.text, word.attrib['pos'])
+                         for word in words]
         return word_tags
 
     def tagged_sentences(self, lemmatize=True):
@@ -45,14 +45,11 @@ class ForumCorpusReader(XMLCorpusReader):
         sent_list = list()
         for sent in sents:
             if lemmatize:
-                word_list = [ ( word.text,
-                                word.attrib['pos'],
-                                self.get_lemma(word) )
-                             for word in sent ]
+                word_list = [(word.text, word.attrib['pos'], self.get_lemma(word))
+                             for word in sent]
             else:
-                word_list = [ ( word.text,
-                                word.attrib['pos'] )
-                                for word in sent ]
+                word_list = [(word.text, word.attrib['pos'])
+                             for word in sent]
             sent_list.append(word_list)
         return sent_list
 
