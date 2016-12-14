@@ -16,14 +16,14 @@ FAM_DIR = 'familjeliv/'
 FLASH_DIR = 'flashback/'
 
 FLASH_LABEL = 'housing'
-FL_LABEL = 'sexsamhallet'
+FL_LABEL = 'sexsamlivet'
 
 NGRAM_ORDER = 1
 TRAIN_TEST_RATIO = 0.7
-MAXENT_CUTOFF = 3
+MAXENT_CUTOFF = 2
 
 TIMESTAMP = str(datetime.now())
-COMMENT = "Familjeliv Housing vs Familjeliv Sexsamhallet"
+COMMENT = "Familjeliv Housing vs Familjeliv Sexsamlivet"
 
 def write_results(results):
     '''Writes results to csv file. Takes a list of results.
@@ -35,6 +35,9 @@ def write_results(results):
 def write_informative_feats(classifier, num_feats):
     '''Takes a classifier and writes out the given number of informative features to disk
     '''
+    if classifier.__name__ != "NaiveBayesClassifier":
+        return
+        
     with open('feats.txt', 'a') as f:
         f.write(str(classifier.most_informative_features(num_feats)) + " " + COMMENT + '\n')
 
@@ -108,7 +111,7 @@ def train_and_classify(classifierClass):
         print("Data point: {data} \nGuess: {guess}".format(data=test_set[i], guess=guess))
         print("Fam probability: {fam} \nFlash probability: {flash}".format(fam=fam_prob, flash=flash_prob))
         print("\n")
-    write_results([TIMESTAMP, train_accuracy, test_accuracy, COMMENT])
+    write_results([TIMESTAMP, classifierClass.__name__, train_accuracy, test_accuracy, COMMENT])
     write_informative_feats(classifier, 10)
 
 if __name__ == '__main__':
