@@ -2,6 +2,7 @@ from nltk.corpus.reader.xmldocs import XMLCorpusView
 from nltk.corpus.reader.xmldocs import XMLCorpusReader
 import re
 
+
 # Prototyped in notebook 0.1
 class ForumCorpusReader(XMLCorpusReader):
     def __init__(self, root, fileid):
@@ -32,12 +33,11 @@ class ForumCorpusReader(XMLCorpusReader):
     def tagged_words(self, lemmatize=True):
         words = XMLCorpusView(self.path, '.*/w')
         if lemmatize:
-            word_tags = [ ( word.text,
-                            word.attrib['pos'],
-                            self.get_lemma(word) )
-                         for word in words ]
+            word_tags = [(word.text, word.attrib['pos'], self.get_lemma(word))
+                         for word in words]
         else:
-            word_tags = [(word.text, word.attrib['pos']) for word in words]
+            word_tags = [(word.text, word.attrib['pos'])
+                         for word in words]
         return word_tags
 
     def tagged_sentences(self, lemmatize=True):
@@ -45,23 +45,16 @@ class ForumCorpusReader(XMLCorpusReader):
         sent_list = list()
         for sent in sents:
             if lemmatize:
-                word_list = [ ( word.text,
-                                word.attrib['pos'],
-                                self.get_lemma(word) )
-                             for word in sent ]
+                word_list = [(word.text, word.attrib['pos'], self.get_lemma(word))
+                             for word in sent]
             else:
-                word_list = [ ( word.text,
-                                word.attrib['pos'] )
-                                for word in sent ]
+                word_list = [(word.text, word.attrib['pos'])
+                             for word in sent]
             sent_list.append(word_list)
         return sent_list
 
 
 if __name__ == '__main__':
-    from scipy.sparse import csr_matrix
-    from nltk.classify import PositiveNaiveBayesClassifier
-    # from nltk.classify import NaiveBayes
-    # nltk.classify.naivebayes.demo()
     fam_corpus = ForumCorpusReader('data/', 'familjeliv-sex25.xml')
     sents = fam_corpus.tagged_sentences()[:25]
     print(sents)

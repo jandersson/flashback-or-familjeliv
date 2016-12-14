@@ -29,14 +29,20 @@ def load_or_generate_features(class_dir, label, load_if_exists=True):
     For each .xml file in DATA_DIR/class_dir, load the corresponding pickle file if exists, otherwise create it.
     """
     # pickle_file = "data/{label}.p".format(label=label)
+
+    abspath = os.path.abspath(__file__)
+    dname = os.path.dirname(abspath)
+    os.chdir(dname)
+
     feature_list = []
     for filename in os.listdir(DATA_DIR + class_dir):
         if filename.endswith(".xml"):
             pickle_file = DATA_DIR + class_dir + filename[:-4] + ".p"
             if not (os.path.isfile(pickle_file) and load_if_exists):
+                print("Generating features from: {filename}".format(filename=filename))
                 feats = generate_features(class_dir, filename, label)
                 pickle.dump(feats, open(pickle_file, "wb"))
-
+            print("Loading features from: {pickle_file}".format(pickle_file=pickle_file))
             feature_list += pickle.load(open(pickle_file, "rb"))
     return feature_list
 
@@ -55,6 +61,7 @@ def train_and_classify():
     test_set_unlabeled = [features for (features, labels) in test_set]
 
     # Create classifier
+    print("Training Naive Bayes Classifier...")
     classifier = NaiveBayesClassifier.train(train_set)
     train_accuracy = classify.accuracy(classifier, train_set)
     test_accuracy = classify.accuracy(classifier, test_set)
@@ -64,6 +71,7 @@ def train_and_classify():
     print("Test accuracy: {acc}".format(acc=test_accuracy))
     print("----------------")
 
+    print(classifier.most_informative_features(10))
     # Print classification with probabilities for 10 test data
     for i, test in enumerate(test_set_unlabeled[:10]):
         guess = classifier.classify(test)

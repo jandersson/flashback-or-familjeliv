@@ -9,10 +9,7 @@ class ForumProfile():
         self.corpus = forum_corpus
         self.classname = classname
         self.ngram_order = ngram_order
-        self.stopwords = stopwords.words('swedish')
-        # self.words = self.preprocess()
-        # self.ngrams = self.make_ngrams()
-        # self.ngram_distribution = FreqDist(self.ngrams)
+        self.stopwords = stopwords.words('swedish') + ["skrev", "skriva", "följande"]
 
     def generate_features(self, use_lemmas=False, do_preprocess=True):
         """If the dataset is tagged then we will use the lemma instead of the word, which is the third element of the data tuple
@@ -56,7 +53,7 @@ if __name__ == '__main__':
 
     from forum_corpus_reader import ForumCorpusReader
 
-    fam_corpus = ForumCorpusReader('../data/', r'familjeliv-sex25.xml')
+    fam_corpus = ForumCorpusReader('data/', r'familjeliv-sex25.xml')
     fam_profile = ForumProfile(fam_corpus, classname=1)
     print(fam_profile.generate_features(do_preprocess=True))
     # fam_profile.corpus.tagged_words()
