@@ -69,16 +69,10 @@ def load_or_generate_features(class_dir, label, load_if_exists=True):
     return feature_list
 
 
-<<<<<<< HEAD
-def train_and_classify():
-    fam_set = load_or_generate_features(FAM_DIR, FL_LABEL)
-    flash_set = load_or_generate_features(FLASH_DIR, FLASH_LABEL)
-=======
 def train_and_classify(classifierClass):
     # Load data
-    fam_set = load_or_generate_features(FAM_DIR, 'fam')
-    flash_set = load_or_generate_features(FLASH_DIR, 'flash')
->>>>>>> 157a8ba32446e9588ae29b85a573f810128e86cd
+    fam_set = load_or_generate_features(FAM_DIR, FL_LABEL)
+    flash_set = load_or_generate_features(FLASH_DIR, FLASH_LABEL)
     data_set = fam_set + flash_set
     random.shuffle(data_set)
 
