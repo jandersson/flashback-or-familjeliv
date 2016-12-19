@@ -15,8 +15,8 @@ DATA_DIR = 'data/'
 FAM_DIR = 'familjeliv/'
 FLASH_DIR = 'flashback/'
 
-FLASH_LABEL = 'housing'
-FL_LABEL = 'sexsamlivet'
+FLASH_LABEL = 'flash'
+FL_LABEL = 'fam'
 
 NGRAM_ORDER = 1
 TRAIN_TEST_RATIO = 0.7
@@ -35,9 +35,9 @@ def write_results(results):
 def write_informative_feats(classifier, num_feats):
     '''Takes a classifier and writes out the given number of informative features to disk
     '''
-    if classifier.__name__ != "NaiveBayesClassifier":
+    if classifier.__class__.__name__ != "NaiveBayesClassifier":
         return
-        
+
     with open('feats.txt', 'a') as f:
         f.write(str(classifier.most_informative_features(num_feats)) + " " + COMMENT + '\n')
 
